@@ -1,0 +1,90 @@
+Before:
+<script>
+function checkel(income,house){
+	if (income < (house-1)*7696 +21775) {
+		answerQ('2',0);
+	} else {
+		answerQ('3',0);
+	} 
+}
+</script>
+
+
+Q(1): Need help determining whether your household is eligible for Massachusetts' School Breakfast and Lunch Program? 
+A: Yes
+	Q(1.1): Are you a Massachusetts resident?
+	A: Yes
+		Q(1.1.1):Are you a parent or primary caregiver responsible for a child(ren) who attends school (high school or under)?
+		A: Yes
+			Q(1.1.1.1): What is your household size?
+			X:householdsize
+				Q(1.1.1.1.1): What is your household income?
+				X:income
+					Q(1.1.1.1.1.1): Did you say your income is <x>income</x> and household size is <x>householdsize</x>?? 
+					A[javascript:checkel(document.getElementById('income').value,document.getElementById('householdsize').value)]: Yes.
+					A: No
+						Q(1.1.1.1.1.1.2):GOTO:3
+		A: No
+			Q(1.1.1.2):GOTO:3
+	A: No
+		Q(1.1.2):GOTO:3
+A: I am eligible. Help me apply. 
+	Q(1.2):GOTO:2.1
+A:[http://www.benefits.gov/benefits/benefit-details/1985] Tell me more about this program. 
+	Q(1.3):GOTO:1
+
+Q(2): You may be eligible. Would you like help applying for the benefits?
+A: Yes
+	Q(2.1): Great, in order to apply, you will need to email your child's school to request enrollment in the program. We will ask you a number of questions and compose an email.
+	A: Got it, lets get started!
+		Q(2.1.1): You'll need the following information to continue: <br> -School Name <br> -School Address <br> -Principle's Name <br> -Principle's Email and <br> -Today's date
+		A: I'm ready with the information
+			Q(2.1.1.1): What is your Child's First Name?
+			X:firstname
+				Q(2.1.1.1.1): What is your Child's Last Name?
+				X:lastname
+					Q(2.1.1.1.1.1):What is the name of your child's school?
+					X:schoolname
+						Q(2.1.1.1.1.1.1):What is the street number and name of the school address? (E.g., 123 School Street)
+						X:schoolstreet
+							Q(2.1.1.1.1.1.1.1):In what city is the school located?
+							X:schoolcity
+								Q(2.1.1.1.1.1.1.1.1):What is the school's zipcode?
+								X:schoolzip
+									Q(2.1.1.1.1.1.1.1.1.1):What is the principle's name? (Please enter both first and last name and any title such as "Ms. Jane Smith")
+									X:principlename
+										Q(2.1.1.1.1.1.1.1.1.1.1):What is the principle's email address?
+										X:principleemail
+											Q(2.1.1.1.1.1.1.1.1.1.1.1):What is today's date? (E.g., January 13, 2016)
+											X:date
+												Q(2.1.1.1.1.1.1.1.1.1.1.1.1): What is your name
+												X:yourname
+													Q(2.1.1.1.1.1.1.1.1.1.1.1.1.1): Is the following correct? <br> <br> Your name is: <x>yourname</x> <br> Your child is: <x>firstname</x> <x>lastname</x> <br> <br> The school is: <x>schoolname</x> located at: <br> <br> <x>schoolstreet</x><br><x>schoolcity</x>, <x>schoolzip</x><br>Massachusetts, USA <br> <br> <x>schoolname</x>'s principle is: <x>principlename</x> and <x>principlename</x>'s email is: <x>principleemail</x>?
+													A: Yes, that is correct.
+														DOC(2.1.1.1.1.1.1.1.1.1.1.1.1.1.1):<x>principlename</x> <br> <x>schoolname</x> <br><x>schoolstreet</x><br><x>schoolcity</x>, MA <x>schoolzip</x><br>USA <br> <br> 
+														Q(2.1.1.1.1.1.1.1.1.1.1.1.1.1.1): We will generate a draft document to notify the school that you would like to enroll in the Massachusetts School Breakfast and Lunch Program. Do you intend to send the principle an email or letter? 
+														A: Email
+															Q(2.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1):GOTO:4
+														A: Letter to print and mail
+															Q(2.1.1.1.1.1.1.1.1.1.1.1.1.1.1.2):GOTO:5
+													A: No, can we make a correction?
+														Q(2.1.1.1.1.1.1.1.1.1.1.1.1.1.2): Yes, please reenter all information. GOTO:2.1.1
+		A:[http://profiles.doe.mass.edu/search/search.aspx] Help me find the information.		
+			Q(2.1.1.2):GOTO:2.1.1
+A: No
+	Q(2.2): Have a great day!
+
+Q(3): Sorry, you are not eligible for Massachusetts' School Breakfast and Lunch Program.
+A:[http://www.benefits.gov/benefits] But other benefits are available! Click here to visit benefits.org and learn more.
+
+Q(4): Working to build the email...
+A: Continue
+	DOC(4.1): Via Email: <x>principleemail</x> <br> <br> Dear <x>principlename</x>: <br> <br> My child <x>firstname</x> <x>lastname</x> is or will be attending <x>schoolname</x>. Our household is eligible for the Massachusetts School Breakfast and Lunch Program and we request enrollment in the program for <x>firstname</x>. <br> <br> Sincerely, <br> <x>yourname</x>
+	Q(4.1): Ready to see the email?
+	A[javascript:submit2('http://www.qnamarkup.org/doc/parse/html/', 'POST', 't', 'Proof read your email. Copy into an email, add a subject, and send it to the principle')]: Yes
+		
+Q(5): Working to build the letter...
+A: Continue
+	DOC(5.1): Via Mail <br> <br> Dear <x>principlename</x>: <br> <br> My child <x>firstname</x> <x>lastname</x> is or will be attending <x>schoolname</x>. Our household is eligible for the Massachusetts School Breakfast and Lunch Program and we request enrollment in the program for <x>firstname</x>. <br> <br> Sincerely, <br> <br> <br> <br> <x>yourname</x>
+	Q(5.1): Ready to see letter?
+	A[javascript:submit2('http://www.qnamarkup.org/doc/parse/html/', 'POST', 't', 'Proof read your letter. Print, sign, and mail it to the principle')]: Yes
